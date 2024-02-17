@@ -1,7 +1,9 @@
 extends StateMachine
 
-export (Curve) var jump_curve
-export (int) var walk_speed = 1000
+@export
+var jump_curve: Curve
+@export
+var walk_speed: int = 1000
 
 var player: PlayerEntity
 var jump_counter: float = 0
@@ -17,9 +19,10 @@ enum States {
 	FALL
 }
 
-onready var current_gravity: float = jump_curve.interpolate_baked(1)
+@onready
+var current_gravity: float = jump_curve.interpolate_baked(1)
 
-func _ready():
+func _ready() -> void:
 	player = owner
 	call_deferred("_set_state", States.IDLE)
 	jump_timer_node = Timer.new()
@@ -27,7 +30,7 @@ func _ready():
 	jump_timer_node.one_shot = true
 	add_child(jump_timer_node)
 
-func _physics_process(delta: float):
+func _physics_process(delta: float) -> void:
 	var velocity = Vector3()
 	match state:
 		States.FALL:
@@ -68,12 +71,14 @@ func jump() -> void:
 			current_gravity = jump_curve.interpolate_baked(0)
 			_set_state(States.JUMP)
 
-remotesync func _update_current_gravity() -> void:
+# TODO: Make remotesync
+func _update_current_gravity() -> void:
 	current_gravity = jump_curve.interpolate_baked(jump_counter / jump_timer)
 	if current_gravity < 0 and not player.is_on_floor():
 		_set_state(States.FALL)
 
-remotesync func _enter_state(new_state, old_state):
+# TODO: Make remotesync
+func _enter_state(new_state, old_state) -> void:
 	match new_state:
 		States.JUMP:
 			jump_direction = _build_move_vector().rotated(Vector3.UP, player.camera_holder.rotation.y)
@@ -83,7 +88,8 @@ remotesync func _enter_state(new_state, old_state):
 		_:
 			jump_direction = Vector3.ZERO
 
-remotesync func _exit_state(old_state, new_state):
+# TODO: Make remotesync
+func _exit_state(old_state, new_state) -> void:
 	pass
 
 func _build_move_vector() -> Vector3:

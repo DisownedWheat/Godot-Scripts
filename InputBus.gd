@@ -1,20 +1,20 @@
 extends Node
 
 signal jump
-signal move_map_changed(move_map)
-signal firing(is_firing)
-signal alt_firing(is_alt_firing)
-signal mouse_movement(x, y)
-signal sprint(is_sprinting)
+signal move_map_changed(move_map: Dictionary)
+signal firing(is_firing: bool)
+signal alt_firing(is_alt_firing: bool)
+signal mouse_movement(x: float, y: float)
+signal sprint(is_sprinting: bool)
 
 var player: KinematicBody
 
-func _ready():
+func _ready() -> void:
 	player = owner
 	if not player is KinematicBody:
 		push_error("Player is not kinematic body in InputBus: " + player.name)
 
-func _input(event: InputEvent):
+func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		emit_signal("mouse_movement", event.relative.x, event.relative.y)
 		return
@@ -47,7 +47,7 @@ func _input(event: InputEvent):
 	if move.hash() != player.move.hash():
 		emit_signal("move_map_changed", move)
 
-func _handle_weapon_input(event):
+func _handle_weapon_input(event) -> void:
 	if event.is_action_pressed("fire"):
 		emit_signal("firing", true)
 	if event.is_action_released("fire"):
